@@ -6,7 +6,7 @@
 
 * 通过NDK进行编译
 
-```
+```shell
     $ $NDK/ndk-build
     [armeabi] Cygwin         : Generating dependency file converter script
     [armeabi] Compile thumb  : uartRs <= uartRS.c
@@ -16,7 +16,7 @@
 
 * 命令格式
   
-```
+```shell
  ./uartRS <serial absolute path> <baudRate> <work mode> <send String>
 ```
 
@@ -68,7 +68,7 @@
 
 * shell脚本示例
 
-```
+```sh
     chmod 777 ./uartRS              # give excute-permission
     # ./uartRS <serial absolute path> <baudRate> <work mode> <send String>
     #./uartRS      /dev/ttymxc2          9600        3       "1234567890ABCDEF"
