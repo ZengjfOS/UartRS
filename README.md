@@ -5,6 +5,15 @@
 ## 使用说明
 
 * 通过NDK进行编译
+
+```
+    $ $NDK/ndk-build
+    [armeabi] Cygwin         : Generating dependency file converter script
+    [armeabi] Compile thumb  : uartRs <= uartRS.c
+    [armeabi] Executable     : uartRs
+    [armeabi] Install        : uartRs => libs/armeabi/uartRs
+```
+
 * 命令格式
   
 ```
