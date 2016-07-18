@@ -1,6 +1,6 @@
 # UartRS
 * 最初的目的是在Android底层作为UART测试工具，之后用来发送AT指令，其实busybox里有同样的工具叫microcom。
-* 目前这个一个Android JNI的project，如果有需要可以尝试修改并在其他平台下运行。
+* 目前这是一个Android JNI的project，如果有需要可以尝试修改并在其他平台下运行。
 
 ## 使用说明
 
