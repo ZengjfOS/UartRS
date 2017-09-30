@@ -7,6 +7,7 @@
 #include <termios.h>    
 #include <errno.h>  
 #include <pthread.h>
+#include <string.h>
 
 #define SENDWORKMODE        1
 #define RECVWORKMODE        2
