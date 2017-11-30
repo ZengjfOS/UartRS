@@ -1,6 +1,16 @@
 # UartRS
-* 最初的目的是在Android底层作为UART测试工具，之后用来发送AT指令，其实busybox里有同样的工具叫microcom。
-* 目前这是一个Android JNI的project，如果有需要可以尝试修改并在其他平台下运行。
+
+* 最初的目的是在Android底层作为UART测试工具，之后用来发送AT指令，其实busybox里有同样的工具叫microcom， 在Android 6中的busybox microcom默认是不自带的，所以不能用；
+* 目前这是一个Android JNI的project，如果有需要可以尝试修改并在其他平台下运行；
+* 利用busybox的shell命令，也是可以直接操作tty设备，这样可以避免编译JNI：[console.sh](console.sh)
+  ```
+    # ./console.sh /dev/ttymxc1 9600
+    
+    Then stty -F /dev/ttymxc1 9600 -cstopb -parity
+    ...
+    exit
+    #
+  ```
 
 ## 使用说明
 

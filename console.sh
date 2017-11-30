@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # console.sh
 
@@ -49,8 +49,9 @@ else
 fi
 
 # Set up device
-MachineType=`uname -p`
-if [ $MachineType == "arm" ]; then
+MachineType=`uname -m`
+CPUType=`expr substr "$MachineType" 1 3`
+if [ $"CPUType" == "arm" ]; then
     busybox stty -F "$1" "$2" "$stopb" "$par" -icrnl
 else
     stty -F "$1" "$2" "$stopb" "$par" -icrnl
@@ -63,7 +64,11 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # Let cat read the device $1 in the background
-cat -v "$1" &
+if [ "$CPUType" == "arm" ]; then
+    busybox cat "$1" &
+else
+    cat -v "$1" &
+fi
 
 # Capture PID of background process so it is possible to terminate it when done
 bgPid="$!"
