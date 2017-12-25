@@ -51,7 +51,7 @@ fi
 # Set up device
 MachineType=`uname -m`
 CPUType=`expr substr "$MachineType" 1 3`
-if [ $"CPUType" == "arm" ]; then
+if [ "$CPUType" == "arm" ]; then
     busybox stty -F "$1" "$2" "$stopb" "$par" -icrnl
 else
     stty -F "$1" "$2" "$stopb" "$par" -icrnl
