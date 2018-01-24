@@ -72,6 +72,7 @@
      1. send;
      2. recv;
      3. send and recv
+     4. loop back test a time
    4. send string
      the string what you want to send
 ```
@@ -92,6 +93,7 @@
     #./uartRS      /dev/ttyACM0          9600        3       "AT+UUSBCONF?"
     #sleep 20 
     #./uartRS      /dev/ttyACM0          9600        3       "AT+UUSBCONF?"
+    #./uartRS      /dev/ttyACM0          9600        4       "AT+UUSBCONF?"
 ```
 
 # Author

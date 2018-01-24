@@ -12,11 +12,12 @@
 #define SENDWORKMODE        1
 #define RECVWORKMODE        2
 #define SENDANDRECVWORKMODE 3
+#define LOOPBACKTest        4
 
 int  serial_fd          = 0;  
 int  serialNumber       = 0;
 int  baudRate           = 0;
-int  workMode           = 0;        // 1 send; 2 recv; 3 send and recv
+int  workMode           = 0;        // 1 send; 2 recv; 3 send and recv; 4 loop back
 char serialString[20]   = {0};
 
 char sendString[512]    = {0};
@@ -38,6 +39,8 @@ void *recvDataThread ( void *arg );
 pthread_t quitOut_thread;
 void *quitOutThead ( void *arg );
 
+void* thread_ret;
+
 int main(int argc, char **argv)  
 {  
     
@@ -50,24 +53,38 @@ int main(int argc, char **argv)
 
     initSerial ();
 
-    if ( workMode == RECVWORKMODE || workMode == SENDANDRECVWORKMODE ) {
+    if ( workMode == RECVWORKMODE || workMode == SENDANDRECVWORKMODE || workMode == LOOPBACKTest ) {
         pthread_create ( &recv_thread, NULL, recvDataThread, NULL );
     }
 
-    pthread_create ( &quitOut_thread, NULL, quitOutThead, NULL );
+    if ( workMode != LOOPBACKTest ) 
+        pthread_create ( &quitOut_thread, NULL, quitOutThead, NULL );
 
     int i = 0;
     while ( 1 ) {
 
-        if ( workMode == SENDWORKMODE || workMode == SENDANDRECVWORKMODE ) {
-            sprintf ( sendString, "%03d: %s\r\n", i++, argv[4] );
+        if ( workMode == LOOPBACKTest ) 
+            usleep ( 100000 );
+
+        if ( workMode == SENDWORKMODE || workMode == SENDANDRECVWORKMODE || workMode == LOOPBACKTest ) {
+
+            if ( workMode != LOOPBACKTest ) 
+                sprintf ( sendString, "%03d: %s\r\n", i++, argv[4] );
+            else
+                sprintf ( sendString, "%s\r\n", argv[4] );
+
             uart_send ( serial_fd, sendString, strlen ( sendString ) );  
         }
+        if ( workMode == LOOPBACKTest ) 
+            break;
+
         usleep ( 2000000 );
     } 
+
+    pthread_join(recv_thread, &thread_ret);
       
     close ( serial_fd );  
-    return 0;  
+    exit(0);
 }
 
 int getWorkMode ( char *workModeString ) {
@@ -83,6 +100,9 @@ int getWorkMode ( char *workModeString ) {
             break;
         case 3 :
             printf ( "workMode: send and recv.\n" );
+            break;
+        case 4 :
+            printf ( "workMode: loopback test.\n" );
             break;
         default:
             printf ( "none of this workMode.\n" );
@@ -114,10 +134,18 @@ void *recvDataThread(void *arg) {
         ret = uart_recv ( serial_fd, recvString, sizeof(recvString) );
         //printf ( "%03d %s\n", i++, recvString );
         //printf ( "%03d %s", 0, recvString );
+
         printf ( "%s", recvString );
+
+        if ( workMode == LOOPBACKTest )
+            if (strchr(recvString, '\n'))
+                break;
+
         bzero ( recvString, sizeof(recvString) );
         usleep ( 200000 );
     }
+
+    return 0;
 }
 
 int help( int argc ) {
