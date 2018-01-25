@@ -43,6 +43,7 @@ void* thread_ret;
 
 int main(int argc, char **argv)  
 {  
+    int flags = 0;
     
     if ( help( argc ) != 0)
         return -1;
@@ -59,12 +60,16 @@ int main(int argc, char **argv)
 
     if ( workMode != LOOPBACKTest ) 
         pthread_create ( &quitOut_thread, NULL, quitOutThead, NULL );
+    else {
+        flags = fcntl(serial_fd, F_GETFL, 0);
+        fcntl(serial_fd, F_SETFL, flags | O_NONBLOCK);
+    }
 
     int i = 0;
     while ( 1 ) {
 
         if ( workMode == LOOPBACKTest ) 
-            usleep ( 100000 );
+            usleep ( 10000 );
 
         if ( workMode == SENDWORKMODE || workMode == SENDANDRECVWORKMODE || workMode == LOOPBACKTest ) {
 
@@ -129,6 +134,7 @@ void *recvDataThread(void *arg) {
 
     int ret = 0;
     int i = 0;
+    int countWaitTimes = 0;
 
     while ( 1 ) {
         ret = uart_recv ( serial_fd, recvString, sizeof(recvString) );
@@ -137,12 +143,17 @@ void *recvDataThread(void *arg) {
 
         printf ( "%s", recvString );
 
-        if ( workMode == LOOPBACKTest )
-            if (strchr(recvString, '\n'))
+        if ( workMode == LOOPBACKTest ) {
+            countWaitTimes++;
+            if ( strchr(recvString, '\n') )
                 break;
 
+            if ( countWaitTimes >= 20 )
+                break;
+        }
+
         bzero ( recvString, sizeof(recvString) );
-        usleep ( 200000 );
+        usleep ( 10000 );
     }
 
     return 0;
