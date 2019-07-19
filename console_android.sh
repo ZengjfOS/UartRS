@@ -24,8 +24,12 @@
 # If no last two params, then default values stopbits=1, parity=disab
 
 # Example: 
-# connect.sh /dev/ttyS0 9600 1 even, this will use 1 stop bit and even parity
-# connect.sh /dev/ttyS0 9600, this will take default values for parity and stopbit
+#   * connect.sh /dev/ttyS0 9600 1 even, this will use 1 stop bit and even parity
+#   * connect.sh /dev/ttyS0 9600, this will take default values for parity and stopbit
+
+# Send Hex
+# \\x01\\x02
+# \\x03\\x04
 
 
 #Check if at least port and baud params provided
@@ -49,9 +53,10 @@ else
 fi
 
 # Set up device
-MachineType=`uname -m`
-CPUType=`expr substr "$MachineType" 1 3`
-if [ "$CPUType" == "arm" ]; then
+# MachineType=`uname -m`
+MachineType=arm
+#CPUType=`busybox expr substr "$MachineType" 1 3`
+if [ "$MachineType" == "arm" ]; then
     busybox stty -F "$1" "$2" "$stopb" "$par" -icrnl
 else
     stty -F "$1" "$2" "$stopb" "$par" -icrnl
@@ -63,12 +68,7 @@ if [ "$?" -ne 0 ]; then
     exit 1;
 fi
 
-# Let cat read the device $1 in the background
-if [ "$CPUType" == "arm" ]; then
-    busybox cat "$1" &
-else
-    cat -v "$1" &
-fi
+cat -v "$1" &
 
 # Capture PID of background process so it is possible to terminate it when done
 bgPid="$!"
@@ -77,7 +77,7 @@ bgPid="$!"
 while [ "$cmd" != "exit" ]
 do
    read cmd
-   echo -e "\x08$cmd\x0D" > "$1" #strip off the \n that read puts and adds \r for windows like LF
+   echo -n -e "$cmd" > "$1" #strip off the \n that read puts and adds \r for windows like LF
 
 done
 
